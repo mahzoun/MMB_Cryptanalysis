@@ -1,1 +1,0 @@
-/usr/bin/c++  -g   CMakeFiles/MMB_Cryptanalysis.dir/main.cpp.o  -o MMB_Cryptanalysis 
