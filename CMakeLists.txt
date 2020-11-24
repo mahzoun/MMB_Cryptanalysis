@@ -3,4 +3,4 @@ project(MMB_Cryptanalysis)
 
 set(CMAKE_CXX_STANDARD 14)
 
-add_executable(MMB_Cryptanalysis main.cpp)
+add_executable(MMB_Cryptanalysis main.cpp BMM.cpp BMM.h)

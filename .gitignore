@@ -31,3 +31,7 @@
 *.exe
 *.out
 *.app
+
+# Mics
+.idea
+cmake-build-debug
