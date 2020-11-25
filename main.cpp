@@ -1,5 +1,6 @@
 #include <iostream>
 #include <cstdint>
+#include <vector>
 #include <bitset>
 #include <ctime>
 
@@ -9,6 +10,7 @@ using namespace std;
 
 uint32_t *P[4][1<<17];
 uint32_t *C[4][1<<17];
+vector<pair<uint32_t,uint32_t>> I[2];
 
 int main() {
     BMM bmm;
@@ -84,10 +86,21 @@ int main() {
     for(uint32_t i = 0; i < (1 << 17); i++) {
         for(uint32_t j = 0; j < (1<<17); j++) {
             if(i != j & rho_P0[i][0] == rho_P1[j][0]){
+                I[0].push_back(make_pair(i, j));
                 cout << i << " " << j << " " << rho_P0[i][0] << " " << rho_P1[j][0] << endl;
             }
         }
     }
-    
+
+
+    for(uint32_t i = 0; i < (1 << 17); i++) {
+        for(uint32_t j = 0; j < (1<<17); j++) {
+            I[1].push_back(make_pair(i, j));
+            if(i != j & P[2][i][1] == P[3][j][1] & P[2][i][2] == P[3][j][2] & P[2][i][3] == P[3][j][3]){
+                cout << i << " " << j << endl;
+            }
+        }
+    }
+
     return 0;
 }
