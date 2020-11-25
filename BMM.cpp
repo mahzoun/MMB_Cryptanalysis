@@ -28,7 +28,7 @@ uint32_t * BMM::gamma(uint32_t x[BLOCK_SIZE])
 {
     uint32_t *y = new uint32_t[BLOCK_SIZE];
     for (uint8_t i = 0; i < BLOCK_SIZE; i++){
-        if (x[i] == ~0x0)
+        if (x[i] == 0xFFFFFFFF)
             y[i] = x[i];
         else {
             uint64_t temp = (uint64_t)x[i] * (uint64_t)G[i];
@@ -42,7 +42,7 @@ uint32_t * BMM::gamma_inv(uint32_t x[BLOCK_SIZE])
 {
     uint32_t *y = new uint32_t[BLOCK_SIZE];
     for (uint8_t i = 0; i < BLOCK_SIZE; i++){
-        if (x[i] == ~0x0)
+        if (x[i] == 0xFFFFFFFF)
             y[i] = x[i];
         else {
             uint64_t temp = (uint64_t)x[i] * (uint64_t)G_inv[i];
