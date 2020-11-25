@@ -47,5 +47,35 @@ int main() {
         C4[i][2] = C2[i][2] ^ ~0x0;
         C4[i][3] = C2[i][3] ^ ~0x0;
     }
+
+    //Test Enc and Dec
+//    uint32_t test[4];
+//    uint32_t *enc = new uint32_t[4];
+//    uint32_t *dec = new uint32_t[4];
+//
+//    for(int i = 0; i < 4; i++)
+//        cout << hex << k[i] << "\t";
+//    cout << endl;
+//
+//    for(int i = 0; i < 4; i++)
+//        cout << hex << test[i] << "\t";
+//    cout << endl;
+//
+////    enc = bmm.rho(test, k, 6);
+//    enc = bmm.sigma(bmm.gamma(bmm.eta(bmm.teta(test))), k, 6);
+//    enc = bmm.Enc(test, k);
+//    for(int i = 0; i < 4; i++)
+//        cout << hex << enc[i] << "\t";
+//    cout << endl;
+//
+////    dec = bmm.rho_inv(enc, k, 6);
+//    dec = bmm.teta(bmm.eta(bmm.gamma_inv(bmm.sigma((enc), k, 6))));
+//    dec = bmm.Dec(enc, k);
+//    for(int i = 0; i < 4; i++)
+//        cout << hex << dec[i] << "\t";
+//    cout << endl;
+
+
+
     return 0;
 }

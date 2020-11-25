@@ -30,8 +30,24 @@ uint32_t * BMM::gamma(uint32_t x[BLOCK_SIZE])
     for (uint8_t i = 0; i < BLOCK_SIZE; i++){
         if (x[i] == ~0x0)
             y[i] = x[i];
-        else
-            y[i] = x[i] * G[i];
+        else {
+            uint64_t temp = (uint64_t)x[i] * (uint64_t)G[i];
+            y[i] = temp % 0xFFFFFFFF;
+        }
+    }
+    return y;
+}
+
+uint32_t * BMM::gamma_inv(uint32_t x[BLOCK_SIZE])
+{
+    uint32_t *y = new uint32_t[BLOCK_SIZE];
+    for (uint8_t i = 0; i < BLOCK_SIZE; i++){
+        if (x[i] == ~0x0)
+            y[i] = x[i];
+        else {
+            uint64_t temp = (uint64_t)x[i] * (uint64_t)G_inv[i];
+            y[i] = temp % 0xFFFFFFFF;
+        }
     }
     return y;
 }
@@ -46,21 +62,44 @@ uint32_t * BMM::sigma(uint32_t x[BLOCK_SIZE], uint32_t k[BLOCK_SIZE], uint8_t J)
     return y;
 }
 
-uint32_t * BMM::rho(uint32_t x[BLOCK_SIZE], uint32_t k[BLOCK_SIZE], uint8_t J)
+uint32_t * BMM::rho(uint32_t x[BLOCK_SIZE], uint32_t k[BLOCK_SIZE], uint32_t J)
 {
-    uint32_t *y = sigma(x, k, J);
-    y = gamma(y);
-    y = eta(y);
-    y = teta(y);
+    uint32_t *y = teta(eta(gamma(sigma(x, k, J))));
+//    y = gamma(y);
+//    y = eta(y);
+//    y = teta(y);
+    return y;
+}
+
+uint32_t * BMM::rho_inv(uint32_t x[BLOCK_SIZE], uint32_t k[BLOCK_SIZE], uint32_t J)
+{
+    uint32_t *y = sigma(gamma_inv(eta(teta(x))), k, J);
+//    y = eta(y);
+//    y = gamma_inv(y);
+//    sigma(y, k, J);
     return y;
 }
 
 uint32_t * BMM::Enc(uint32_t x[BLOCK_SIZE], uint32_t k[BLOCK_SIZE])
 {
-    uint32_t *y = rho(x, k, 0);
-    for(uint8_t i = 0; i < ROUNDS; i++)
+    uint32_t *y;
+    y = rho(x, k, 0);
+    for(uint8_t i = 1; i < ROUNDS; i++)
         y = rho(y, k, i);
     y = sigma(y, k, 6);
+    return y;
+}
+
+uint32_t * BMM::Dec(uint32_t x[BLOCK_SIZE], uint32_t k[BLOCK_SIZE])
+{
+    uint32_t *y = sigma(x, k, 6);
+//    for(int i = 0; i < 4; i++)
+//        std::cout <<y[i] << " ";
+//    std::cout << "\n";
+    for(int i = ROUNDS - 1; i >= 0; i--) {
+//        std::cout << i << "\n";
+        y = rho_inv(y, k, i);
+    }
     return y;
 }
 
