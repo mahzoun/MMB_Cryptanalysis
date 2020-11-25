@@ -43,7 +43,9 @@ int main() {
 
     for(uint32_t i = 0; i < (1<<17); i++){
         // Generate randome plaintexts
-        P[0][i][0] = rand();
+        for(uint32_t j = 0; j < bmm.BLOCK_SIZE; j++)
+            P[0][i][j] = rand();
+
         P[1][i][0] = P[0][i][0];
         P[1][i][1] = 0xFFFFFFFF ^ P[0][i][1];
         P[1][i][2] = P[0][i][2];
@@ -70,34 +72,22 @@ int main() {
         P[3][i] = bmm.Dec(C[3][i], k[3]);
     }
 
-    //Test Enc and Dec
-//    uint32_t test[4];
-//    uint32_t *enc = new uint32_t[4];
-//    uint32_t *dec = new uint32_t[4];
-//
-//    for(int i = 0; i < 4; i++)
-//        cout << hex << k[i] << "\t";
-//    cout << endl;
-//
-//    for(int i = 0; i < 4; i++)
-//        cout << hex << test[i] << "\t";
-//    cout << endl;
-//
-////    enc = bmm.rho(test, k, 6);
-//    enc = bmm.sigma(bmm.gamma(bmm.eta(bmm.teta(test))), k, 6);
-//    enc = bmm.Enc(test, k);
-//    for(int i = 0; i < 4; i++)
-//        cout << hex << enc[i] << "\t";
-//    cout << endl;
-//
-////    dec = bmm.rho_inv(enc, k, 6);
-//    dec = bmm.teta(bmm.eta(bmm.gamma_inv(bmm.sigma((enc), k, 6))));
-//    dec = bmm.Dec(enc, k);
-//    for(int i = 0; i < 4; i++)
-//        cout << hex << dec[i] << "\t";
-//    cout << endl;
-
-
-
+    // find I and J such that P[0][I][0] = P[1][J][0] after one round of rho.
+    uint32_t *rho_P0[1<<17];
+    uint32_t *rho_P1[1<<17];
+    for(uint32_t i = 0; i < (1<<17); i++) {
+        rho_P0[i] = bmm.rho(P[0][i], k[0], 0);
+    }
+    for(uint32_t j = 0; j < (1<<17); j++){
+        rho_P1[j] = bmm.rho(P[1][j], k[0], 0);
+    }
+    for(uint32_t i = 0; i < (1 << 17); i++) {
+        for(uint32_t j = 0; j < (1<<17); j++) {
+            if(i != j & rho_P0[i][0] == rho_P1[j][0]){
+                cout << i << " " << j << " " << rho_P0[i][0] << " " << rho_P1[j][0] << endl;
+            }
+        }
+    }
+    
     return 0;
 }
