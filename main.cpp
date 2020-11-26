@@ -42,20 +42,20 @@ void Init_keys()
     k[3][1] = k[0][1];
     k[3][2] = k[0][2];
     k[3][3] = k[0][3];
-//    uint32_t test[4];
-//    for(int i = 0; i < 4; i++)
-//        test[i] = 0;
-//    for(int i = 0; i < 4; i++)
-//        cout<<test[i] << " ";
-//    cout << endl;
-//    bmm.Enc(test, k[0]);
-//    for(int i = 0; i < 4; i++)
-//        cout<<hex << test[i] << " ";
-//    cout << endl;
-//    bmm.Dec(test, k[0]);
-//    for(int i = 0; i < 4; i++)
-//        cout<<test[i] << " ";
-//    cout << endl;
+    uint32_t test[4];
+    for(int i = 0; i < 4; i++)
+        test[i] = 0;
+    for(int i = 0; i < 4; i++)
+        cout<<test[i] << " ";
+    cout << endl;
+    bmm.Enc(test, k[0]);
+    for(int i = 0; i < 4; i++)
+        cout<<hex << test[i] << " ";
+    cout << endl;
+    bmm.Dec(test, k[0]);
+    for(int i = 0; i < 4; i++)
+        cout<<test[i] << " ";
+    cout << endl;
 
 }
 
@@ -147,26 +147,27 @@ int main() {
     // find I and J such that P[0][I][0] = P[1][J][0] after one round of rho.
 //    uint32_t *rho_P0[1<<17];
 //    uint32_t *rho_P1[1<<17];
-//    for(uint32_t i = 0; i < (1<<17); i++) {
-//        bmm.rho(P[0][i], k[0], 0);
-//    }
-//    for(uint32_t j = 0; j < (1<<17); j++){
-//        bmm.rho(P[1][j], k[0], 0);
-//    }
-//    for(uint32_t i = 0; i < (1 << 17); i++) {
-//        for(uint32_t j = 0; j < (1<<17); j++) {
-//            if(i != j & P[0][i][0] == P[1][j][0]){
-//                I[0].push_back(make_pair(i, j));
-//                cout << i << " " << j << " " << P[0][i][0] << " " << P[1][j][0] << endl;
-//            }
-//        }
-//    }
+    for(uint32_t i = 0; i < (1<<17); i++) {
+        bmm.rho(P[0][i], k[0], 0);
+    }
+    for(uint32_t j = 0; j < (1<<17); j++){
+        bmm.rho(P[1][j], k[0], 0);
+    }
+    for(uint32_t i = 0; i < (1 << 17); i++) {
+        for(uint32_t j = 0; j < (1<<17); j++) {
+            if(i != j & P[0][i][0] == P[1][j][0]){
+                I[0].push_back(make_pair(i, j));
+                cout << i << " " << j << " " << P[0][i][0] << " " << P[1][j][0] << endl;
+            }
+        }
+    }
 
 
     for(uint32_t i = 0; i < (1 << 17); i++) {
         for(uint32_t j = 0; j < (1<<17); j++) {
 //            Dif(P[2][i], P[3][i]);
-            if(P[2][i][1] == P[3][j][1] & P[2][i][2] == P[3][j][2] & P[2][i][3] == P[3][j][3]){
+//            if(((P[2][i][1] ^ P[3][j][1]) == 0xFFFFFFFF) & (P[2][i][2] == P[3][j][2]) & ((P[2][i][3] ^ P[3][j][3])== 0xFFFFFFFF)){
+              if(P[2][i][0] == P[3][j][0]){
                 I[1].push_back(make_pair(i, j));
                 cout << i << " " << j << endl;
             }
