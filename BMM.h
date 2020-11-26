@@ -17,7 +17,7 @@ public:
     const uint32_t G_inv[BLOCK_SIZE] = {0xDAD4694, 0x06D6A34A, 0x81B5A8D2, 0x281B5A8D};
     uint32_t* Enc(uint32_t[], uint32_t[]);
     uint32_t* Dec(uint32_t[], uint32_t[]);
-    void sigma(uint32_t[], uint32_t[], uint8_t);
+    void sigma(uint32_t[], uint32_t[], uint32_t);
     void gamma(uint32_t[]);
     void gamma_inv(uint32_t[]);
     void eta(uint32_t[]);

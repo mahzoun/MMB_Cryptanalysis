@@ -51,11 +51,11 @@ void BMM::gamma_inv(uint32_t x[BLOCK_SIZE])
         x[i] = y[i];
 }
 
-void BMM::sigma(uint32_t x[BLOCK_SIZE], uint32_t k[BLOCK_SIZE], uint8_t J)
+void BMM::sigma(uint32_t x[BLOCK_SIZE], uint32_t k[BLOCK_SIZE], uint32_t J)
 {
     uint32_t y[BLOCK_SIZE];
     for (int i = 0; i < BLOCK_SIZE; i++){
-        uint32_t k_iJ = k[(i+J)%4] ^ ((1<<J) * B);
+        uint32_t k_iJ = k[(i+J)%4];// ^ ((1<<J) * B);
         y[i] = x[i] ^ k_iJ;
     }
     for(int i = 0; i < BLOCK_SIZE; i++)

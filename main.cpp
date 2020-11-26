@@ -42,6 +42,21 @@ void Init_keys()
     k[3][1] = k[0][1];
     k[3][2] = k[0][2];
     k[3][3] = k[0][3];
+//    uint32_t test[4];
+//    for(int i = 0; i < 4; i++)
+//        test[i] = 0;
+//    for(int i = 0; i < 4; i++)
+//        cout<<test[i] << " ";
+//    cout << endl;
+//    bmm.Enc(test, k[0]);
+//    for(int i = 0; i < 4; i++)
+//        cout<<hex << test[i] << " ";
+//    cout << endl;
+//    bmm.Dec(test, k[0]);
+//    for(int i = 0; i < 4; i++)
+//        cout<<test[i] << " ";
+//    cout << endl;
+
 }
 
 void Init_texts()
@@ -55,12 +70,16 @@ void Init_texts()
             PP[j][i] = new uint32_t[bmm.BLOCK_SIZE];
         }
 
+    for(uint32_t j = 0; j < bmm.BLOCK_SIZE; j++) {
+        P[0][0][j] = rand();
+    }
     for(uint32_t i = 0; i < (1<<17); i++){
         // Generate randome plaintexts
-        for(uint32_t j = 0; j < bmm.BLOCK_SIZE; j++) {
-            P[0][i][j] = rand();
+        if(i > 0) {
+            P[0][i][0] = rand();
+            for (int j = 1; j < bmm.BLOCK_SIZE; j++)
+                P[0][i][j] = P[0][0][j];
         }
-
         P[1][i][0] = P[0][i][0];
         P[1][i][1] = 0xFFFFFFFF ^ P[0][i][1];
         P[1][i][2] = P[0][i][2];
@@ -74,8 +93,6 @@ void Init_texts()
         // Generate encryption
         C[0][i] = bmm.Enc(PP[0][i], k[0]);
         C[1][i] = bmm.Enc(PP[1][i], k[0]);
-        
-        Dif(C[0][i], C[1][i]);
         // C[2] = C[0] ^ (0, 0, ~0, ~0)
         C[2][i][0] = C[0][i][0];
         C[2][i][1] = C[0][i][1];
@@ -113,7 +130,6 @@ int main() {
     BMM bmm;
     Init_keys();
     Init_texts();
-
 //    uint32_t test[4];
 //    for(int i = 0; i < 4; i++)
 //        cout<<test[i] << " ";
@@ -149,6 +165,7 @@ int main() {
 
     for(uint32_t i = 0; i < (1 << 17); i++) {
         for(uint32_t j = 0; j < (1<<17); j++) {
+//            Dif(P[2][i], P[3][i]);
             if(P[2][i][1] == P[3][j][1] & P[2][i][2] == P[3][j][2] & P[2][i][3] == P[3][j][3]){
                 I[1].push_back(make_pair(i, j));
                 cout << i << " " << j << endl;
