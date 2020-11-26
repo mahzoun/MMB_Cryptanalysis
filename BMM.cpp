@@ -4,29 +4,26 @@
 
 #include "BMM.h"
 
-uint32_t * BMM::teta(uint32_t x[BLOCK_SIZE])
+void BMM::teta(uint32_t x[BLOCK_SIZE])
 {
-    uint32_t *y = new uint32_t[BLOCK_SIZE];
+    uint32_t y[BLOCK_SIZE];
     y[0] = x[0] ^ x[1] ^ x[3];
     y[1] = x[0] ^ x[1] ^ x[2];
     y[2] = x[1] ^ x[2] ^ x[3];
     y[3] = x[0] ^ x[2] ^ x[3];
-    return y;
+    for(int i = 0; i < BLOCK_SIZE; i++)
+        x[i] = y[i];
 }
 
-uint32_t * BMM::eta(uint32_t x[BLOCK_SIZE])
+void BMM::eta(uint32_t x[BLOCK_SIZE])
 {
-    uint32_t *y = new uint32_t[BLOCK_SIZE];
-    y[0] = x[0] ^ ((1&x[0])*delta);
-    y[1] = x[1];
-    y[2] = x[2];
-    y[3] = x[3] ^ ((1&x[3])*delta);
-    return y;
+    x[0] = x[0] ^ ((1&x[0])*delta);
+    x[3] = x[3] ^ ((1&x[3])*delta);
 }
 
-uint32_t * BMM::gamma(uint32_t x[BLOCK_SIZE])
+void BMM::gamma(uint32_t x[BLOCK_SIZE])
 {
-    uint32_t *y = new uint32_t[BLOCK_SIZE];
+    uint32_t y[BLOCK_SIZE];
     for (uint8_t i = 0; i < BLOCK_SIZE; i++){
         if (x[i] == 0xFFFFFFFF)
             y[i] = x[i];
@@ -35,12 +32,13 @@ uint32_t * BMM::gamma(uint32_t x[BLOCK_SIZE])
             y[i] = temp % 0xFFFFFFFF;
         }
     }
-    return y;
+    for(int i = 0; i < BLOCK_SIZE; i++)
+        x[i] = y[i];
 }
 
-uint32_t * BMM::gamma_inv(uint32_t x[BLOCK_SIZE])
+void BMM::gamma_inv(uint32_t x[BLOCK_SIZE])
 {
-    uint32_t *y = new uint32_t[BLOCK_SIZE];
+    uint32_t y[BLOCK_SIZE];
     for (uint8_t i = 0; i < BLOCK_SIZE; i++){
         if (x[i] == 0xFFFFFFFF)
             y[i] = x[i];
@@ -49,57 +47,52 @@ uint32_t * BMM::gamma_inv(uint32_t x[BLOCK_SIZE])
             y[i] = temp % 0xFFFFFFFF;
         }
     }
-    return y;
+    for(int i = 0; i < BLOCK_SIZE; i++)
+        x[i] = y[i];
 }
 
-uint32_t * BMM::sigma(uint32_t x[BLOCK_SIZE], uint32_t k[BLOCK_SIZE], uint8_t J)
+void BMM::sigma(uint32_t x[BLOCK_SIZE], uint32_t k[BLOCK_SIZE], uint8_t J)
 {
-    uint32_t *y = new uint32_t[BLOCK_SIZE];
+    uint32_t y[BLOCK_SIZE];
     for (int i = 0; i < BLOCK_SIZE; i++){
         uint32_t k_iJ = k[(i+J)%4] ^ ((1<<J) * B);
         y[i] = x[i] ^ k_iJ;
     }
-    return y;
+    for(int i = 0; i < BLOCK_SIZE; i++)
+        x[i] = y[i];
 }
 
-uint32_t * BMM::rho(uint32_t x[BLOCK_SIZE], uint32_t k[BLOCK_SIZE], uint32_t J)
+void BMM::rho(uint32_t x[BLOCK_SIZE], uint32_t k[BLOCK_SIZE], uint32_t J)
 {
-    uint32_t *y = teta(eta(gamma(sigma(x, k, J))));
-//    y = gamma(y);
-//    y = eta(y);
-//    y = teta(y);
-    return y;
+    sigma(x, k, J);
+    gamma(x);
+    eta(x);
+    teta(x);
 }
 
 uint32_t * BMM::rho_inv(uint32_t x[BLOCK_SIZE], uint32_t k[BLOCK_SIZE], uint32_t J)
 {
-    uint32_t *y = sigma(gamma_inv(eta(teta(x))), k, J);
-//    y = eta(y);
-//    y = gamma_inv(y);
-//    sigma(y, k, J);
-    return y;
+    teta(x);
+    eta(x);
+    gamma_inv(x);
+    sigma(x, k, J);
 }
 
 uint32_t * BMM::Enc(uint32_t x[BLOCK_SIZE], uint32_t k[BLOCK_SIZE])
 {
-    uint32_t *y;
-    y = rho(x, k, 0);
-    for(uint8_t i = 1; i < ROUNDS; i++)
-        y = rho(y, k, i);
-    y = sigma(y, k, 6);
-    return y;
+    for(uint8_t i = 0; i < ROUNDS; i++)
+        rho(x, k, i);
+    sigma(x, k, 6);
+    return x;
 }
 
 uint32_t * BMM::Dec(uint32_t x[BLOCK_SIZE], uint32_t k[BLOCK_SIZE])
 {
-    uint32_t *y = sigma(x, k, 6);
-//    for(int i = 0; i < 4; i++)
-//        std::cout <<y[i] << " ";
-//    std::cout << "\n";
+    sigma(x, k, 6);
     for(int i = ROUNDS - 1; i >= 0; i--) {
 //        std::cout << i << "\n";
-        y = rho_inv(y, k, i);
+        rho_inv(x, k, i);
     }
-    return y;
+    return x;
 }
 
