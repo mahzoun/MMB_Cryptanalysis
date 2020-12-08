@@ -2,9 +2,9 @@
 // Created by sauron on 11/24/20.
 //
 
-#include "BMM.h"
+#include "MMB.h"
 
-void BMM::teta(uint32_t x[BLOCK_SIZE])
+void MMB::teta(uint32_t x[BLOCK_SIZE])
 {
     uint32_t y[BLOCK_SIZE];
     y[0] = x[0] ^ x[1] ^ x[3];
@@ -15,13 +15,13 @@ void BMM::teta(uint32_t x[BLOCK_SIZE])
         x[i] = y[i];
 }
 
-void BMM::eta(uint32_t x[BLOCK_SIZE])
+void MMB::eta(uint32_t x[BLOCK_SIZE])
 {
     x[0] = x[0] ^ ((1&x[0])*delta);
     x[3] = x[3] ^ ((1&x[3])*delta);
 }
 
-void BMM::gamma(uint32_t x[BLOCK_SIZE])
+void MMB::gamma(uint32_t x[BLOCK_SIZE])
 {
     uint32_t y[BLOCK_SIZE];
     for (uint8_t i = 0; i < BLOCK_SIZE; i++){
@@ -36,7 +36,7 @@ void BMM::gamma(uint32_t x[BLOCK_SIZE])
         x[i] = y[i];
 }
 
-void BMM::gamma_inv(uint32_t x[BLOCK_SIZE])
+void MMB::gamma_inv(uint32_t x[BLOCK_SIZE])
 {
     uint32_t y[BLOCK_SIZE];
     for (uint8_t i = 0; i < BLOCK_SIZE; i++){
@@ -51,7 +51,7 @@ void BMM::gamma_inv(uint32_t x[BLOCK_SIZE])
         x[i] = y[i];
 }
 
-void BMM::sigma(uint32_t x[BLOCK_SIZE], uint32_t k[BLOCK_SIZE], uint32_t J)
+void MMB::sigma(uint32_t x[BLOCK_SIZE], uint32_t k[BLOCK_SIZE], uint32_t J)
 {
     uint32_t y[BLOCK_SIZE];
     for (int i = 0; i < BLOCK_SIZE; i++){
@@ -62,7 +62,7 @@ void BMM::sigma(uint32_t x[BLOCK_SIZE], uint32_t k[BLOCK_SIZE], uint32_t J)
         x[i] = y[i];
 }
 
-void BMM::rho(uint32_t x[BLOCK_SIZE], uint32_t k[BLOCK_SIZE], uint32_t J)
+void MMB::rho(uint32_t x[BLOCK_SIZE], uint32_t k[BLOCK_SIZE], uint32_t J)
 {
     sigma(x, k, J);
     gamma(x);
@@ -70,7 +70,7 @@ void BMM::rho(uint32_t x[BLOCK_SIZE], uint32_t k[BLOCK_SIZE], uint32_t J)
     teta(x);
 }
 
-uint32_t * BMM::rho_inv(uint32_t x[BLOCK_SIZE], uint32_t k[BLOCK_SIZE], uint32_t J)
+uint32_t * MMB::rho_inv(uint32_t x[BLOCK_SIZE], uint32_t k[BLOCK_SIZE], uint32_t J)
 {
     teta(x);
     eta(x);
@@ -78,7 +78,7 @@ uint32_t * BMM::rho_inv(uint32_t x[BLOCK_SIZE], uint32_t k[BLOCK_SIZE], uint32_t
     sigma(x, k, J);
 }
 
-uint32_t * BMM::Enc(uint32_t x[BLOCK_SIZE], uint32_t k[BLOCK_SIZE])
+uint32_t * MMB::Enc(uint32_t x[BLOCK_SIZE], uint32_t k[BLOCK_SIZE])
 {
     for(uint8_t i = 0; i < ROUNDS; i++)
         rho(x, k, i);
@@ -86,7 +86,7 @@ uint32_t * BMM::Enc(uint32_t x[BLOCK_SIZE], uint32_t k[BLOCK_SIZE])
     return x;
 }
 
-uint32_t * BMM::Dec(uint32_t x[BLOCK_SIZE], uint32_t k[BLOCK_SIZE])
+uint32_t * MMB::Dec(uint32_t x[BLOCK_SIZE], uint32_t k[BLOCK_SIZE])
 {
     sigma(x, k, 6);
     for(int i = ROUNDS - 1; i >= 0; i--) {
@@ -95,4 +95,3 @@ uint32_t * BMM::Dec(uint32_t x[BLOCK_SIZE], uint32_t k[BLOCK_SIZE])
     }
     return x;
 }
-

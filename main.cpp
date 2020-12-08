@@ -4,7 +4,7 @@
 #include <bitset>
 #include <ctime>
 
-#include "BMM.h"
+#include "MMB.h"
 
 using namespace std;
 
@@ -21,7 +21,7 @@ void Dif(uint32_t a[], uint32_t b[]){
 
 void Init_keys()
 {
-    BMM bmm;
+    MMB bmm;
     srand((unsigned) time(0));
     for(uint8_t i = 0; i < bmm.BLOCK_SIZE; i++)
         k[0][i] = rand();
@@ -61,7 +61,7 @@ void Init_keys()
 
 void Init_texts()
 {
-    BMM bmm;
+    MMB bmm;
     for (int j = 0; j < 4; j++)
         for(int i = 0 ; i < (1<<17); i++){
             C[j][i] = new uint32_t[bmm.BLOCK_SIZE];
@@ -127,7 +127,7 @@ void Init_texts()
 
 }
 int main() {
-    BMM bmm;
+    MMB bmm;
     Init_keys();
     Init_texts();
 //    uint32_t test[4];
@@ -167,7 +167,7 @@ int main() {
         for(uint32_t j = 0; j < (1<<17); j++) {
 //            Dif(P[2][i], P[3][i]);
 //            if(((P[2][i][1] ^ P[3][j][1]) == 0xFFFFFFFF) & (P[2][i][2] == P[3][j][2]) & ((P[2][i][3] ^ P[3][j][3])== 0xFFFFFFFF)){
-              if(P[2][i][0] == P[3][j][0]){
+            if(P[2][i][0] == P[3][j][0]){
                 I[1].push_back(make_pair(i, j));
                 cout << i << " " << j << endl;
             }

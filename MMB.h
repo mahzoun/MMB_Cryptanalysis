@@ -8,7 +8,7 @@
 #include <cstdint>
 #include <cmath>
 
-class BMM {
+class MMB {
 public:
     const static uint8_t BLOCK_SIZE = 4, ROUNDS = 6;
     const uint32_t delta = 0x2AAAAAAA;
