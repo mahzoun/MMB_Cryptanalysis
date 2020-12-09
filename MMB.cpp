@@ -55,6 +55,7 @@ void MMB::sigma(uint32_t x[BLOCK_SIZE], uint32_t k[BLOCK_SIZE], uint32_t J)
 {
     uint32_t y[BLOCK_SIZE];
     for (int i = 0; i < BLOCK_SIZE; i++){
+//TODO fix k_iJ
         uint32_t k_iJ = k[(i+J)%4];// ^ ((1<<J) * B);
         y[i] = x[i] ^ k_iJ;
     }
@@ -78,20 +79,22 @@ uint32_t * MMB::rho_inv(uint32_t x[BLOCK_SIZE], uint32_t k[BLOCK_SIZE], uint32_t
     sigma(x, k, J);
 }
 
-uint32_t * MMB::Enc(uint32_t x[BLOCK_SIZE], uint32_t k[BLOCK_SIZE])
+void MMB::Enc(uint32_t x[BLOCK_SIZE], uint32_t k[BLOCK_SIZE], uint32_t y[BLOCK_SIZE])
 {
+    for(int i = 0 ;i < BLOCK_SIZE;i++)
+        y[i] = x[i];
     for(uint8_t i = 0; i < ROUNDS; i++)
-        rho(x, k, i);
-    sigma(x, k, 6);
-    return x;
+        rho(y, k, i);
+    sigma(y, k, 6);
 }
 
-uint32_t * MMB::Dec(uint32_t x[BLOCK_SIZE], uint32_t k[BLOCK_SIZE])
+void MMB::Dec(uint32_t x[BLOCK_SIZE], uint32_t k[BLOCK_SIZE], uint32_t y[BLOCK_SIZE])
 {
-    sigma(x, k, 6);
+    for(int i = 0 ;i < BLOCK_SIZE;i++)
+        y[i] = x[i];
+    sigma(y, k, 6);
     for(int i = ROUNDS - 1; i >= 0; i--) {
 //        std::cout << i << "\n";
-        rho_inv(x, k, i);
+        rho_inv(y, k, i);
     }
-    return x;
 }
