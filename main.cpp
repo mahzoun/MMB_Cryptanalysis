@@ -94,7 +94,7 @@ void Init_texts()
 
         // Generate encryption
         bmm.Enc(P[0][i], k[0], C[0][i]);
-        bmm.Enc(P[1][i], k[0], C[1][i]);
+        bmm.Enc(P[1][i], k[1], C[1][i]);
         // C[2] = C[0] ^ (0, 0, ~0, ~0)
         C[2][i][0] = C[0][i][0];
         C[2][i][1] = C[0][i][1];
@@ -180,7 +180,7 @@ int main() {
     for(uint32_t i = 0; i < (1 << 17); i++) {
         for(uint32_t j = 0; j < (1<<17); j++) {
 //            Dif(P[2][i], P[3][i]);
-            if(((P[2][i][1] ^ P[3][j][1]) == 0xFFFFFFFF)){ // & (P[2][i][2] == P[3][j][2]) & ((P[2][i][3] ^ P[3][j][3])== 0xFFFFFFFF)){
+            if(((P[2][i][1] ^ P[3][j][1]) == 0xFFFFFFFF) & (P[2][i][2] == P[3][j][2]) & ((P[2][i][3] ^ P[3][j][3])== 0xFFFFFFFF)){
 //            if(P[2][i][0] == P[3][j][0]){
                 I[1].push_back(make_pair(i, j));
                 Dif(P[2][i], P[3][j]);
