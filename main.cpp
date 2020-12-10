@@ -23,8 +23,11 @@ void Init_keys()
 {
     MMB bmm;
     srand((unsigned) time(0));
-    for(uint8_t i = 0; i < bmm.BLOCK_SIZE; i++)
+    for(uint8_t i = 0; i < bmm.BLOCK_SIZE; i++) {
         k[0][i] = rand();
+        cout << hex << k[0][i] << " ";
+    }
+    cout << "\n__________________________________________________\n\n";
     // k[1] = k[0] ^ (~0, 0, 0, ~0)
     k[1][0] = k[0][0] ^ 0xFFFFFFFF;
     k[1][1] = k[0][1];
@@ -148,33 +151,36 @@ int main() {
     // find I and J such that P[0][I][0] = P[1][J][0] after one round of rho.
 //    uint32_t *rho_P0[1<<17];
 //    uint32_t *rho_P1[1<<17];
-    for(uint32_t i = 0; i < (1<<17); i++) {
-        for(int j = 0; j < 4; j++)
-            PP[0][i][j] = P[0][i][j];
-        bmm.sigma(PP[0][i], k[0], 0);
-        bmm.gamma(PP[0][i]);
-        bmm.eta(PP[0][i]);
-        bmm.teta(PP[0][i]);
-    }
-    for(uint32_t i = 0; i < (1<<17); i++){
-        for(int j = 0; j < 4; j++)
-            PP[1][i][j] = P[1][i][j];
-        bmm.sigma(PP[1][i], k[1], 0);
-        bmm.gamma(PP[1][i]);
-        bmm.eta(PP[1][i]);
-        bmm.teta(PP[1][i]);
-    }
-
-
-//    for(uint32_t i = 0; i < (1 << 17); i++) {
-//        for(uint32_t j = 0; j < (1<<17); j++) {
-//            if(PP[0][i][0] == PP[1][j][0]){
-//                Dif(PP[0][i], PP[1][j]);
-//                I[0].push_back(make_pair(i, j));
-//                cout << i << " " << j << " " << hex << PP[0][i][0] << " " << PP[1][j][0] << endl;
-//            }
-//        }
+//    for(uint32_t i = 0; i < (1<<17); i++) {
+//        for(int j = 0; j < 4; j++)
+//            PP[0][i][j] = P[0][i][j];
+//        bmm.sigma(PP[0][i], k[0], 0);
+//        bmm.gamma(PP[0][i]);
+//        bmm.eta(PP[0][i]);
+//        bmm.teta(PP[0][i]);
 //    }
+    for(uint32_t i = 0; i < (1<<17); i++){
+        for(int ii = 0; ii < 4; ii++) {
+            for (int j = 0; j < 4; j++)
+                PP[ii][i][j] = P[ii][i][j];
+            bmm.sigma(PP[ii][i], k[ii], 0);
+            bmm.gamma(PP[ii][i]);
+            bmm.eta(PP[ii][i]);
+            bmm.teta(PP[ii][i]);
+        }
+    }
+
+
+
+    for(uint32_t i = 0; i < (1 << 17); i++) {
+        for(uint32_t j = 0; j < (1<<17); j++) {
+            if(PP[0][i][0] == PP[1][j][0]){
+                Dif(PP[0][i], PP[1][j]);
+                I[0].push_back(make_pair(i, j));
+                cout << "Values for P0 and P1 " << i << " " << j << " " << hex << PP[0][i][0] << " " << PP[1][j][0] << endl;
+            }
+        }
+    }
 
 
     for(uint32_t i = 0; i < (1 << 17); i++) {
@@ -184,25 +190,41 @@ int main() {
 //            if(P[2][i][0] == P[3][j][0]){
                 I[1].push_back(make_pair(i, j));
                 Dif(P[2][i], P[3][j]);
-                cout << "  ---  " << i << " " << j << endl;
+                cout << "Values for P2 and P3 " << i << " " << j << endl;
             }
         }
     }
+
+
     //Brute force for the key value
-//    uint32_t *key_test = new uint32_t[4];
-//    for(uint32_t i = 0; i <= k[0][0]; i++){
-//        key_test[0] = key_test[2] = i;
-//        key_test[1] = key_test[3] = i ^ 0xFFFFFFFF;
-//        for(int j = 0; j < I[0].size(); j++){
-//            cout << "last loop   " << i << " " << j << endl;
-//            bmm.rho(PP[0][I[0][j].first], key_test, 0);
-//            bmm.rho(PP[1][I[0][j].second], key_test, 0);
-//            bmm.rho(PP[0][I[1][j].first], key_test, 0);
-//            bmm.rho(PP[1][I[1][j].second], key_test, 0);
-//            if( PP[0][I[0][j].first][0] == PP[0][I[0][j].second][0] and PP[2][I[1][j].first][0] == PP[3][I[1][j].second][0]){
-//                cout<<key_test[0]<<endl;
-//            }
+//    cout << I[0].size() << " " << I[1].size() << endl;
+//    for(int i = 0; i < (1 << 17); i++) {
+//        for(int j = 0; j < 4; j++) {
+//            PP[0][i][j] = P[0][i][j];
+//            PP[1][i][j] = P[1][i][j];
+//            PP[2][i][j] = P[2][i][j];
+//            PP[3][i][j] = P[3][i][j];
 //        }
 //    }
+    uint32_t key_test[4][4];
+    for(int i = 0; i < 4; i++)
+        for(int j = 0; j < 4; j++)
+            key_test[i][j] = 0;
+    for(uint32_t i = 0; i < (1<<32); i++){
+        key_test[0][0] = key_test[2][0] = i;
+        key_test[1][0] = key_test[3][0] = i ^ 0xFFFFFFFF;
+        for(int j = 0; j < I[0].size(); j++){
+//            cout << "last loop   " << i << " " << j << endl;
+//            bmm.rho(PP[0][I[0][j].first], key_test[0], 0);
+//            bmm.rho(PP[1][I[0][j].second], key_test[1], 0);
+//            bmm.rho(PP[2][I[1][j].first], key_test[2], 0);
+//            bmm.rho(PP[3][I[1][j].second], key_test[3], 0);
+//            Dif(PP[0][I[0][j].first], PP[1][I[0][j].second]);
+//            Dif(PP[2][I[1][j].first], PP[3][I[1][j].second]);
+            if( PP[0][I[0][j].first][0] == PP[1][I[0][j].second][0] and PP[2][I[1][j].first][0] == PP[3][I[1][j].second][0]){
+                cout<<k[0][0] << " " << key_test[0][0]<<endl;
+            }
+        }
+    }
     return 0;
 }
